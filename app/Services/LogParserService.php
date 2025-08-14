@@ -19,34 +19,20 @@ class LogParserService implements LogParserServiceInterface
         private Pattern $pattern
     ) {}
 
-    /**
-     * @param string $parseLine
-     * @return LogEntryDTO|null
-     */
     public function stringParse(string $parseLine): ?LogEntryDTO
     {
         try {
             $parseLine = trim($parseLine);
-            if ($parseLine === '') {
-                return null;
-            }
-
-            $pattern = $this->pattern->getPattern();       // ✅ регулярка
-            $identifiers = $this->format->getIdentifiers(); // ✅ ключи
+            $pattern = $this->pattern->getPattern();
+            $identifiers = $this->format->getIdentifiers();
 
             preg_match($pattern, $parseLine, $matches);
             array_shift($matches);
 
-            if (count($identifiers) !== count($matches)) {
-                return null; // некорректная строка
-            }
-
             // Парсим дату из логов
             $data = array_combine($identifiers, $matches);
             $dt = DateTime::createFromFormat('d/M/Y:H:i:s O', $data['request_date']);
-            if (!$dt) {
-                return null;
-            }
+
             $data['request_date'] = $dt->format('Y-m-d H:i:s');
 
             //Нормализация User-Agent
@@ -106,7 +92,7 @@ class LogParserService implements LogParserServiceInterface
             return null;
         }
 
-        $this->repository->postLogs($dto); // сохраняем в БД
-        return $dto; // возвращаем DTO, как обещано в типе
+        $this->repository->postLogs($dto);
+        return $dto;
     }
 }

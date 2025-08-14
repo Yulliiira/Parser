@@ -46,38 +46,29 @@ class LogController extends Controller
             'date_from' => $request->input('date_from'),
             'date_to' => $request->input('date_to'),
         ];
-//        //фильтры для теста
-//        $filters = [
-//            'os' => null,
-//            'architecture' => null,
-//            'date_from' => null,
-//            'date_to' => null,
-//        ];
 
         // Данные таблицы
         $logs = $this->logRepository->getLogsFiltered($filters);
         $graphData = $this->logAnalyticsService->getGraphData($filters);
 
-        // График 1: число запросов по датам
+        // График 1
         $requestsChart = new Chart;
         if (!empty($graphData['dates'])) {
-            $requestsChart->labels(array_values($graphData['dates']));
-            $requestsChart->dataset('Запросы', 'line', array_map(function($date) use ($logs) {
-                return $logs->firstWhere('date', $date)->requests_count ?? 0;
-            }, $graphData['dates']))->backgroundColor('transparent');
+            $requestsChart->labels($graphData['dates']);
+            $requestsChart
+                ->dataset('Запросы', 'line', $graphData['requests']);
         }
 
-        // График 2: доля 3-х популярных браузеров
+        // График 2
         $browsersChart = new Chart;
         if (!empty($graphData['browsers'])) {
-            $browsersChart->labels(array_values($graphData['dates']));
+            $browsersChart->labels($graphData['dates']);
             foreach ($graphData['browsers'] as $browser => $series) {
-                $browsersChart->dataset($browser, 'line', $series)
-                    ->backgroundColor('transparent');
+                $browsersChart
+                    ->dataset($browser, 'line', $series);
             }
         }
 //        dd($graphData);// для отладки
-
         return view('welcome', compact('logs', 'requestsChart', 'browsersChart'));
     }
 }
