@@ -42,7 +42,7 @@ class LogAnalyticsService implements LogAnalyticsServiceInterface
             }
             $browsersData[$browser] = $series;
         }
-
+//        dd($rows);
         return [
             'dates' => $dates,
             'browsers' => $browsersData

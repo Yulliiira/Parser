@@ -6,8 +6,8 @@ use App\Contracts\LogParser\PatternInterface;
 
 class Pattern implements PatternInterface
 {
-    public function getIdentifiers(): array
+    public function getPattern(): string
     {
-        return ['ip_address', 'request_date', 'url', 'user_agent'];
+        return '/^([\d\.]+) - - \[([^\]]+)\] "\S+ ([^"]+) HTTP\/[0-9.]+" \d+ \d+ "[^"]*" "([^"]+)"$/';
     }
 }

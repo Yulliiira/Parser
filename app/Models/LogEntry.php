@@ -17,7 +17,7 @@ class LogEntry extends Model
         'os',
         'architecture',
         'browser',
-        'user_agent',
+        'user_agent'
     ];
 
     protected $casts = [

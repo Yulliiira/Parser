@@ -38,7 +38,7 @@ class ParseLogsCommand extends Command
      */
     public function handle(): int
     {
-        $filePath = 'storage/logs/laravel.log';
+        $filePath = storage_path('logs/nginx-access.log');
 
         if (!file_exists($filePath)) {
             $this->error("Файл не найден: {$filePath}");
@@ -51,7 +51,7 @@ class ParseLogsCommand extends Command
         $count = 0;
 
         while (($line = fgets($handle)) !== false) {
-            $result = $this->parserService->stringParse(trim($line));
+            $result = $this->parserService->parseAndSave(trim($line)); // <-- Сохраняем в БД
             if ($result) {
                 $count++;
             }

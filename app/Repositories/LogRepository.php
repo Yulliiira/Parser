@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Contracts\LogRepositoryInterface;
 use App\DTO\LogEntryDTO;
 use App\Models\LogEntry;
-use Illuminate\Support\Facades\DB;
 
 class LogRepository implements LogRepositoryInterface
 {

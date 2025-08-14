@@ -6,8 +6,8 @@ use App\Contracts\LogParser\FormatInterface;
 
 class Format implements FormatInterface
 {
-    public function getPattern(): string
+    public function getIdentifiers(): array
     {
-        return '/^([\w\.\:]+) - - \[([^\]]+)\] "\S+ ([^"]+)" \d+ \d+ "[^"]*" "([^"]+)"$/';
+        return ['ip_address', 'request_date', 'url', 'user_agent'];
     }
 }

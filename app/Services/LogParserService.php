@@ -9,6 +9,7 @@ use DateTime;
 use App\Contracts\LogParserServiceInterface;
 use App\Contracts\LogRepositoryInterface;
 use App\DTO\LogEntryDTO;
+use App\Models\LogEntry;
 
 class LogParserService implements LogParserServiceInterface
 {
@@ -19,20 +20,22 @@ class LogParserService implements LogParserServiceInterface
     ) {}
 
     /**
-     * @param string $line
+     * @param string $parseLine
      * @return LogEntryDTO|null
      */
-    public function stringParse(string $line): ?LogEntryDTO
+    public function stringParse(string $parseLine): ?LogEntryDTO
     {
         try {
-            $line = trim($line);
-            if ($line === '') {
+            $parseLine = trim($parseLine);
+            if ($parseLine === '') {
                 return null;
             }
 
-            preg_match($this->format->getPattern(), $line, $matches);
+            $pattern = $this->pattern->getPattern();       // ✅ регулярка
+            $identifiers = $this->format->getIdentifiers(); // ✅ ключи
+
+            preg_match($pattern, $parseLine, $matches);
             array_shift($matches);
-            $identifiers = $this->pattern->getIdentifiers();
 
             if (count($identifiers) !== count($matches)) {
                 return null; // некорректная строка
@@ -103,6 +106,7 @@ class LogParserService implements LogParserServiceInterface
             return null;
         }
 
-        return $this->repository->postLogs($dto);
+        $this->repository->postLogs($dto); // сохраняем в БД
+        return $dto; // возвращаем DTO, как обещано в типе
     }
 }

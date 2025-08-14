@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Логи</title>
 </head>
 <body>
 
@@ -22,15 +22,29 @@
     <tbody>
     @foreach($logs as $log)
         <tr>
-            <td>{{ $log->date }}</td>
-            <td>{{ $log->requests_count }}</td>
-            <td>{{ $log->top_url }}</td>
-            <td>{{ $log->top_browser }}</td>
+            <td>{{ $log['request_date'] }}</td>
+            <td>{{ $log['request_count'] }}</td>
+            <td>{{ $log['url'] }}</td>
+            <td>{{ $log['browser'] }}</td>
         </tr>
     @endforeach
     </tbody>
 </table>
 
+<h2>Общее число запросов</h2>
+<div>
+    {!! $requestsChart->container() !!}
+</div>
+
+<h2>Процентная доля трёх самых популярных браузеров</h2>
+<div>
+    {!! $browsersChart->container() !!}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.0.2/echarts-en.min.js" charset="utf-8"></script>
+
+{!! $requestsChart->script() !!}
+{!! $browsersChart->script() !!}
 
 </body>
 </html>

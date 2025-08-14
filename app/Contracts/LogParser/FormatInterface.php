@@ -4,5 +4,5 @@ namespace App\Contracts\LogParser;
 
 interface FormatInterface
 {
-    public function getPattern(): string;
+    public function getIdentifiers(): array;
 }
