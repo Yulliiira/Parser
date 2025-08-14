@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Contracts\LogAnalyticsServiceInterface;
+use App\Contracts\LogParser\FormatInterface;
+use App\Contracts\LogParser\PatternInterface;
+use App\Services\LogAnalyticsService;
+use App\Services\LogParser\Format;
+use App\Services\LogParser\Pattern;
 use Illuminate\Support\ServiceProvider;
 
 use App\Contracts\LogParserServiceInterface;
@@ -18,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(LogParserServiceInterface::class, LogParserService::class);
         $this->app->bind(LogRepositoryInterface::class, LogRepository::class);
+        $this->app->bind(LogAnalyticsServiceInterface::class, LogAnalyticsService::class);
+        $this->app->bind(PatternInterface::class, Pattern::class );
+        $this->app->bind(FormatInterface::class, Format::class );
     }
 
     /**

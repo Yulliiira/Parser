@@ -2,30 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\LogRepositoryInterface;
 use Illuminate\Http\Request;
-
-use Illuminate\Http\JsonResponse;
-
-use App\Http\Resources\LogEntryResource;
 use App\Services\LogParserService;
 
 
 class LogController extends Controller
 {
+    public function __construct(private LogRepositoryInterface $logRepository,
+    private LogParserService $logParserService)
+    {
+    }
+
+
     /**
-     * @param Request $request
-     * @param LogParserService $parser
-     * @return LogEntryResource| JsonResponse
+     * API для парсинга одной строки лога
      */
-    public function index(Request $request, LogParserService $parser)
+    public function index(Request $request)
     {
         $line = $request->input('line');
-        $model = $parser->stringParse($line);
+
+        if (!$line) {
+            return response()->json(['error' => 'Line is required'], 400);
+        }
+
+        $model = $this->logParserService->stringParse($line);
 
         if (!$model) {
             return response()->json(['error' => 'Invalid log format'], 400);
         }
 
-        return new LogEntryResource($model);
+        return response()->json($model);
+    }
+
+    public function dashboard(Request $request)
+    {
+        $filters = [
+            'os' => $request->input('os'),
+            'architecture' => $request->input('architecture'),
+            'date_from' => $request->input('date_from'),
+            'date_to' => $request->input('date_to'),
+        ];
+
+        // Данные из репозитория
+        $logs = $this->logRepository->getLogsFiltered($filters);
+        $graphData = $this->logRepository->getGraphData($filters);
+
+        return view('welcome', compact('logs', 'graphData'));
     }
 }

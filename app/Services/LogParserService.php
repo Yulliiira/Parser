@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\LogParser\Format;
+use App\Services\LogParser\Pattern;
 use DateTime;
 
 use App\Contracts\LogParserServiceInterface;
@@ -10,88 +12,97 @@ use App\DTO\LogEntryDTO;
 
 class LogParserService implements LogParserServiceInterface
 {
-    /**
-     * @param LogRepositoryInterface $repository
-     */
     public function __construct(
         private LogRepositoryInterface $repository,
-    )
-    {
-    }
+        private Format $format,
+        private Pattern $pattern
+    ) {}
 
     /**
-     * @param string $parseLine
+     * @param string $line
      * @return LogEntryDTO|null
      */
-    public function stringParse(string $parseLine): ?LogEntryDTO
+    public function stringParse(string $line): ?LogEntryDTO
     {
-        $regularExpression = '/^([\w\.\:]+) - - \[([^\]]+)\] "\S+ ([^"]+)" \d+ \d+ "[^"]*" "([^"]+)"$/';
-
         try {
-            if (!preg_match($regularExpression, $parseLine, $m)) {
+            $line = trim($line);
+            if ($line === '') {
                 return null;
             }
 
-            $ip = $m[1];
+            preg_match($this->format->getPattern(), $line, $matches);
+            array_shift($matches);
+            $identifiers = $this->pattern->getIdentifiers();
+
+            if (count($identifiers) !== count($matches)) {
+                return null; // некорректная строка
+            }
 
             // Парсим дату из логов
-            $dt = DateTime::createFromFormat('d/M/Y:H:i:s O', $m[2]);
+            $data = array_combine($identifiers, $matches);
+            $dt = DateTime::createFromFormat('d/M/Y:H:i:s O', $data['request_date']);
             if (!$dt) {
                 return null;
             }
-            $date = $dt->format('Y-m-d H:i:s');
-            $url = $m[3];
-            $ua = trim($m[4]);
+            $data['request_date'] = $dt->format('Y-m-d H:i:s');
 
             //Нормализация User-Agent
-            $uaNormalized = strtolower($ua);
+            $uaNormalized = strtolower($data['user_agent']);
             $uaNormalized = preg_replace('/\s+/', ' ', $uaNormalized); // схлопываем пробелы
             $uaNormalized = str_replace(['edg/', 'opr/'], ['edge/', 'opera/'], $uaNormalized); // заменяем алиасы
 
             // Определяем ОС и архитектуру
-            $os = 'Unknown';
+            $data['os'] = 'Unknown';
             if (str_contains($uaNormalized, 'windows')) {
-                $os = 'Windows';
+                $data['os'] = 'Windows';
             } elseif (str_contains($uaNormalized, 'linux')) {
-                $os = 'Linux';
+                $data['os'] = 'Linux';
             } elseif (str_contains($uaNormalized, 'mac os') || str_contains($uaNormalized, 'macintosh')) {
-                $os = 'MacOS';
+                $data['os'] = 'MacOS';
             }
 
-            $arch = 'Unknown';
+            $data['architecture'] = 'Unknown';
             if (str_contains($uaNormalized, 'x86_64') || str_contains($uaNormalized, 'win64')) {
-                $arch = 'x64';
+                $data['architecture'] = 'x64';
             } elseif (preg_match('/\bx86\b/i', $uaNormalized)) {
-                $arch = 'x86';
+                $data['architecture'] = 'x86';
             }
 
             // Определяем браузер
-            $browser = 'Unknown';
+            $data['browser'] = 'Unknown';
             if (str_contains($uaNormalized, 'edge/')) {
-                $browser = 'Edge';
+                $data['browser'] = 'Edge';
             } elseif (str_contains($uaNormalized, 'opera/')) {
-                $browser = 'Opera';
+                $data['browser'] = 'Opera';
             } elseif (str_contains($uaNormalized, 'chrome') && !str_contains($uaNormalized, 'chromium')) {
-                $browser = 'Chrome';
+                $data['browser'] = 'Chrome';
             } elseif (str_contains($uaNormalized, 'safari') && !str_contains($uaNormalized, 'chrome')) {
-                $browser = 'Safari';
+                $data['browser'] = 'Safari';
             }
 
-            $dto = new LogEntryDTO(
-                ip_address: $ip,
-                request_date: $date,
-                url: $url,
-                os: $os,
-                architecture: $arch,
-                browser: $browser,
-                user_agent: $ua
+            return new LogEntryDTO(
+                ip_address: $data['ip_address'],
+                request_date: $data['request_date'],
+                url: $data['url'],
+                os: $data['os'],
+                architecture: $data['architecture'],
+                browser: $data['browser'],
+                user_agent: $data['user_agent']
             );
 
-            return $this->repository->postLogs($dto);
         } catch (\Throwable $e) {
-            // Логируем, но не прерываем выполнение сервиса
-            error_log("[LogParser] Ошибка парсинга: " . $e->getMessage());
+            error_log("[LogParser] Ошибка парсинга: " . $e->getMessage());// Логируем
             return null;
         }
+    }
+
+    public function parseAndSave(string $line): ?LogEntryDTO
+    {
+        $dto = $this->stringParse($line);
+        if (!$dto) {
+            return null;
+        }
+
+        return $this->repository->postLogs($dto);
     }
 }

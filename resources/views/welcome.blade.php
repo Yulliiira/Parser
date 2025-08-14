@@ -9,15 +9,28 @@
 </head>
 <body>
 
+<h2>Таблица логов</h2>
 <table>
-    @foreach($)
     <thead>
     <tr>
-        <th></th>
+        <th>Дата</th>
+        <th>Число запросов</th>
+        <th>Самый популярный URL</th>
+        <th>Самый популярный браузер</th>
     </tr>
     </thead>
+    <tbody>
+    @foreach($logs as $log)
+        <tr>
+            <td>{{ $log->date }}</td>
+            <td>{{ $log->requests_count }}</td>
+            <td>{{ $log->top_url }}</td>
+            <td>{{ $log->top_browser }}</td>
+        </tr>
     @endforeach
+    </tbody>
 </table>
+
 
 </body>
 </html>

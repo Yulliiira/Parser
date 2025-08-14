@@ -3,6 +3,7 @@
 namespace App\Contracts;
 
 use App\DTO\LogEntryDTO;
+use Illuminate\Database\Eloquent\Collection;
 
 interface LogRepositoryInterface
 {
@@ -28,5 +29,5 @@ interface LogRepositoryInterface
      * @param array $filters
      * @return array
      */
-    public function getGraphData(array $filters = []): array;
+    public function getRawGraphData(array $filters = []): Collection;
 }
