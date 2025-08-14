@@ -25,7 +25,6 @@ class ParseLogsCommand extends Command
      * @var string
      */
     protected $description = 'Парсит лог nginx и сохраняет данные в БД';
-//    private $parserService;
 
     public function __construct(LogParserService $parserService)
     {
@@ -51,8 +50,13 @@ class ParseLogsCommand extends Command
         $count = 0;
 
         while (($line = fgets($handle)) !== false) {
-            $result = $this->parserService->parseAndSave(trim($line)); // <-- Сохраняем в БД
-            if ($result) {
+            $line = trim($line);
+            $result = $this->parserService->parseAndSave($line);
+
+            if (!$result) {
+                $this->warn("Не удалось распарсить: {$line}");
+            } else {
+                $this->info("OK: {$line}");
                 $count++;
             }
         }

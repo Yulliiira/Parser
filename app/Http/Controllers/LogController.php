@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\LogRepositoryInterface;
 use App\Services\LogAnalyticsService;
 use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 use Illuminate\Http\Request;
@@ -11,11 +10,10 @@ use App\Services\LogParserService;
 
 class LogController extends Controller
 {
-    public function __construct(private LogRepositoryInterface $logRepository,
+    public function __construct(
         private LogAnalyticsService $logAnalyticsService,
-        private LogParserService $logParserService,)
-    {
-    }
+        private LogParserService $logParserService
+    ) {}
 
 
     /**
@@ -48,7 +46,7 @@ class LogController extends Controller
         ];
 
         // Данные таблицы
-        $logs = $this->logRepository->getLogsFiltered($filters);
+        $logs = $this->logAnalyticsService->getLogsFiltered($filters);
         $graphData = $this->logAnalyticsService->getGraphData($filters);
 
         // График 1

@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Services\LogParser\Format;
-use App\Services\LogParser\Pattern;
 use DateTime;
 
+use App\Services\LogParser\Format;
+use App\Services\LogParser\Pattern;
 use App\Contracts\LogParserServiceInterface;
 use App\Contracts\LogRepositoryInterface;
 use App\DTO\LogEntryDTO;
-use App\Models\LogEntry;
 
 class LogParserService implements LogParserServiceInterface
 {
@@ -23,22 +22,31 @@ class LogParserService implements LogParserServiceInterface
     {
         try {
             $parseLine = trim($parseLine);
+            if ($parseLine === '') {
+                return null;
+            }
             $pattern = $this->pattern->getPattern();
             $identifiers = $this->format->getIdentifiers();
 
             preg_match($pattern, $parseLine, $matches);
             array_shift($matches);
 
+            if (count($matches) !== count($identifiers)) {
+                error_log("[LogParser] Несовпадение количества полей. "
+                    . "Ожидалось: " . count($identifiers) . ", получено: " . count($matches)
+                    . " | Строка: $parseLine");
+                return null;
+            }
             // Парсим дату из логов
             $data = array_combine($identifiers, $matches);
             $dt = DateTime::createFromFormat('d/M/Y:H:i:s O', $data['request_date']);
-
+            if (!$dt) return null;
             $data['request_date'] = $dt->format('Y-m-d H:i:s');
 
             //Нормализация User-Agent
             $uaNormalized = strtolower($data['user_agent']);
-            $uaNormalized = preg_replace('/\s+/', ' ', $uaNormalized); // схлопываем пробелы
-            $uaNormalized = str_replace(['edg/', 'opr/'], ['edge/', 'opera/'], $uaNormalized); // заменяем алиасы
+            $uaNormalized = preg_replace('/\s+/', ' ', $uaNormalized);
+            $uaNormalized = str_replace(['edg/', 'opr/'], ['edge/', 'opera/'], $uaNormalized);
 
             // Определяем ОС и архитектуру
             $data['os'] = 'Unknown';
@@ -88,9 +96,7 @@ class LogParserService implements LogParserServiceInterface
     public function parseAndSave(string $line): ?LogEntryDTO
     {
         $dto = $this->stringParse($line);
-        if (!$dto) {
-            return null;
-        }
+        if (!$dto) return null;
 
         $this->repository->postLogs($dto);
         return $dto;

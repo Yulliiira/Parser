@@ -2,17 +2,20 @@
 
 namespace App\Services;
 
+use App\Contracts\LogAnalyticsRepositoryInterface;
 use App\Contracts\LogAnalyticsServiceInterface;
-use App\Contracts\LogRepositoryInterface;
 
 class LogAnalyticsService implements LogAnalyticsServiceInterface
 {
-    public function __construct(private LogRepositoryInterface $logRepository)
-    {
-    }
+    public function __construct(private LogAnalyticsRepositoryInterface $logAnalyticsRepository) {}
 
     public function getGraphData(array $filters = []): array
     {
-        return $this->logRepository->getRawGraphData($filters);
+        return $this->logAnalyticsRepository->getRawGraphData($filters);
+    }
+
+    public function getLogsFiltered(array $filters = [], array $sort = [])
+    {
+        return $this->logAnalyticsRepository->getLogsFiltered($filters, $sort);
     }
 }

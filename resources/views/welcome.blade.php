@@ -23,10 +23,10 @@
     <tbody>
     @foreach($logs as $log)
         <tr>
-            <td>{{ $log['request_date'] }}</td>
-            <td>{{ $log['request_count'] }}</td>
-            <td>{{ $log['url'] }}</td>
-            <td>{{ $log['browser'] }}</td>
+            <td>{{ $log->date }}</td>
+            <td>{{ $log->request_count }}</td>
+            <td>{{ $log->url }}</td>
+            <td>{{ $log->browser }}</td>
         </tr>
     @endforeach
     </tbody>
