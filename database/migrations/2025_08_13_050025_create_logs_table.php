@@ -14,13 +14,12 @@ return new class extends Migration
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
             $table->ipAddress();
-            $table->date('request_date');
+            $table->timestamp('request_date');
             $table->string('url');
             $table->string('os');
             $table->string('architecture');
             $table->string('browser');
             $table->string('user_agent');
-            $table->timestamps();
         });
     }
 
