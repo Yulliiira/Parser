@@ -2,9 +2,8 @@
 
 ### Возможности
 #### Парсинг логов в формате
-127.0.0.1 - - [21/Mar/2019:00:20:06 +0300] "GET /favicon/favicon-32.png HTTP/1.1" 200 1306
-"http://modimio.loc/icms/catalog/catalog_edit?id=4" "Mozilla/5.0 (X11; Linux x86_64)
-AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36"
+192.168.65.1 - - [15/Aug/2025:05:25:40 +0000] "GET /dashboard HTTP/1.1" 200 7479 "-" "Mozilla/5.0 
+(Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.3
 
 #### Извлечение данных:
 IP-адрес
