@@ -56,6 +56,10 @@ chmod 664 storage/logs/nginx-access.log
 ```
 docker compose up --build -d
 ```
+Запускаем консольную команду
+```
+docker compose exec php php artisan logs:parse
+```
 
 
 
