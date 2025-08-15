@@ -39,9 +39,24 @@ http://localhost:8080/dashboard
 #### Данные фильтруются без перезагрузки страниц и обновляются после запуска консольной команды
 
 ### Запуск приложения
+Создать .env
+```
+cp .env.example .env
+```
+
+Создать файл для логов
+```
+touch storage/logs/nginx-access.log
+```
+Установить права
+```
+chmod 664 storage/logs/nginx-access.log
+```
+Запустить контейнеры
 ```
 docker compose up --build -d
 ```
+
 
 
 
