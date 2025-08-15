@@ -2,9 +2,10 @@
 
 namespace App\Contracts;
 
+use Illuminate\Database\Eloquent\Collection;
+
 use App\DTO\LogDTO;
 use App\Models\Log;
-use Illuminate\Database\Eloquent\Collection;
 
 interface LogRepositoryInterface
 {

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 
+use App\Http\Resources\LogResource;
 use App\Contracts\LogAnalyticsServiceInterface;
 use App\Contracts\LogParserServiceInterface;
 
@@ -34,7 +35,7 @@ class LogController extends Controller
             return response()->json(['error' => 'Invalid log format'], 400);
         }
 
-        return response()->json($model);
+        return new LogResource($model);
     }
 
     public function dashboard(Request $request)
