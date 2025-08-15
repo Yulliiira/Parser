@@ -2,23 +2,28 @@
 
 namespace App\Services;
 
+use App\Contracts\LogParser\FormatInterface;
+use App\Contracts\LogParser\PatternInterface;
 use DateTime;
 
-use App\Services\LogParser\Format;
-use App\Services\LogParser\Pattern;
 use App\Contracts\LogParserServiceInterface;
 use App\Contracts\LogRepositoryInterface;
-use App\DTO\LogEntryDTO;
+use App\DTO\LogDTO;
 
 class LogParserService implements LogParserServiceInterface
 {
     public function __construct(
         private LogRepositoryInterface $repository,
-        private Format $format,
-        private Pattern $pattern
-    ) {}
+        private FormatInterface $format,
+        private PatternInterface $pattern
+     ) {}
 
-    public function stringParse(string $parseLine): ?LogEntryDTO
+    /**
+     * разбирает одну строку лога
+     * @param string $parseLine
+     * @return LogDTO|null
+     */
+    public function stringParse(string $parseLine): ?LogDTO
     {
         try {
             $parseLine = trim($parseLine);
@@ -77,7 +82,7 @@ class LogParserService implements LogParserServiceInterface
                 $data['browser'] = 'Safari';
             }
 
-            return new LogEntryDTO(
+            return new LogDTO(
                 ip_address: $data['ip_address'],
                 request_date: $data['request_date'],
                 url: $data['url'],
@@ -88,12 +93,17 @@ class LogParserService implements LogParserServiceInterface
             );
 
         } catch (\Throwable $e) {
-            error_log("[LogParser] Ошибка парсинга: " . $e->getMessage());// Логируем
+            error_log("[LogParser] Ошибка парсинга: " . $e->getMessage());
             return null;
         }
     }
 
-    public function parseAndSave(string $line): ?LogEntryDTO
+    /**
+     * парсим строку и сохраняем бд
+     * @param string $line
+     * @return LogDTO|null
+     */
+    public function parseAndSave(string $line): ?LogDTO
     {
         $dto = $this->stringParse($line);
         if (!$dto) return null;

@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-class LogEntryDTO
+class LogDTO
 {
     /**
      * @param string $ip_address

@@ -2,13 +2,13 @@
 
 namespace App\Contracts;
 
-use App\DTO\LogEntryDTO;
-use App\Models\LogEntry;
+use App\DTO\LogDTO;
+use App\Models\Log;
 use Illuminate\Database\Eloquent\Collection;
 
 interface LogRepositoryInterface
 {
     public function getLogs(): Collection;
-    public function postLogs(LogEntryDTO $dto): LogEntry;
+    public function postLogs(LogDTO $dto): Log;
 }
 

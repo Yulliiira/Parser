@@ -2,30 +2,30 @@
 
 namespace App\Repositories;
 
-use App\Contracts\LogAnalyticsRepositoryInterface;
-use App\Models\LogEntry;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+
+use App\Contracts\LogAnalyticsRepositoryInterface;
+use App\Models\Log;
 
 class LogAnalyticsRepository implements LogAnalyticsRepositoryInterface
 {
     /**
      *  Возвращает отфильтрованные логи
-     * @param $query
      * @param array $filters
      * @param array $sort
      * @return Collection|mixed
      */
     public function getLogsFiltered(array $filters = [], array $sort = [])
     {
-        $daily = LogEntry::selectRaw('DATE(request_date) as d_date, COUNT(*) as request_count')
+        $daily = Log::selectRaw('DATE(request_date) as d_date, COUNT(*) as request_count')
             ->groupByRaw('DATE(request_date)');
 
-        $topUrl = LogEntry::selectRaw('DATE(request_date) as u_date, url, COUNT(*) as cnt')
+        $topUrl = Log::selectRaw('DATE(request_date) as u_date, url, COUNT(*) as cnt')
             ->groupByRaw('DATE(request_date), url')
             ->orderByRaw('cnt DESC');
 
-        $topBrowser = LogEntry::selectRaw('DATE(request_date) as b_date, browser, COUNT(*) as cnt')
+        $topBrowser = Log::selectRaw('DATE(request_date) as b_date, browser, COUNT(*) as cnt')
             ->groupByRaw('DATE(request_date), browser')
             ->orderByRaw('cnt DESC');
 
@@ -58,7 +58,7 @@ class LogAnalyticsRepository implements LogAnalyticsRepositoryInterface
      */
     public function getRawGraphData(array $filters = []): array
     {
-        $query = LogEntry::query()
+        $query = Log::query()
             ->selectRaw('
             DATE(request_date) as date,
             browser,
@@ -74,7 +74,7 @@ class LogAnalyticsRepository implements LogAnalyticsRepositoryInterface
         $dates = $rows->pluck('date')->unique()->values()->toArray();
         $totalsByDate = [];
         $counts = [];
-
+        //подсчет запросов
         foreach ($rows as $r) {
             $totalsByDate[$r->date] = ($totalsByDate[$r->date] ?? 0) + $r->count;
             $counts[$r->browser][$r->date] = $r->count;
@@ -86,7 +86,7 @@ class LogAnalyticsRepository implements LogAnalyticsRepositoryInterface
             ->keys()
             ->take(3)
             ->toArray();
-
+        //формируем данные
         $browsersData = [];
         foreach ($topBrowsers as $browser) {
             $series = [];
@@ -105,6 +105,12 @@ class LogAnalyticsRepository implements LogAnalyticsRepositoryInterface
         ];
     }
 
+    /**
+     * фильтры
+     * @param $query
+     * @param $filters
+     * @return void
+     */
     private function applyFilters($query, $filters): void
     {
         if (!empty($filters['os'])) {

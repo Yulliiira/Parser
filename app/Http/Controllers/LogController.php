@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\LogAnalyticsService;
-use ConsoleTVs\Charts\Classes\Chartjs\Chart;
 use Illuminate\Http\Request;
-use App\Services\LogParserService;
+
+use ConsoleTVs\Charts\Classes\Chartjs\Chart;
+
+use App\Contracts\LogAnalyticsServiceInterface;
+use App\Contracts\LogParserServiceInterface;
 
 
 class LogController extends Controller
 {
     public function __construct(
-        private LogAnalyticsService $logAnalyticsService,
-        private LogParserService $logParserService
+        private LogAnalyticsServiceInterface $logAnalyticsService,
+        private LogParserServiceInterface $logParserService
     ) {}
 
-
     /**
-     * API для парсинга одной строки лога
+     * для парсинга одной строки лога
      */
     public function index(Request $request)
     {
@@ -49,7 +50,7 @@ class LogController extends Controller
         $logs = $this->logAnalyticsService->getLogsFiltered($filters);
         $graphData = $this->logAnalyticsService->getGraphData($filters);
 
-        // График 1
+        // Графики
         $requestsChart = new Chart;
         if (!empty($graphData['dates'])) {
             $requestsChart->labels($graphData['dates']);
@@ -57,7 +58,6 @@ class LogController extends Controller
                 ->dataset('Запросы', 'line', $graphData['requests']);
         }
 
-        // График 2
         $browsersChart = new Chart;
         if (!empty($graphData['browsers'])) {
             $browsersChart->labels($graphData['dates']);

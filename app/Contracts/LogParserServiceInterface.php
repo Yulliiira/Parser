@@ -2,11 +2,11 @@
 
 namespace App\Contracts;
 
-use App\DTO\LogEntryDTO;
+use App\DTO\LogDTO;
 
 interface LogParserServiceInterface
 {
-    public function stringParse(string $parseParseLine): ?LogEntryDTO;
-    public function parseAndSave(string $line): ?LogEntryDTO;
+    public function stringParse(string $parseParseLine): ?LogDTO;
+    public function parseAndSave(string $line): ?LogDTO;
 
 }

@@ -5,8 +5,8 @@ namespace App\Repositories;
 use Illuminate\Database\Eloquent\Collection;
 
 use App\Contracts\LogRepositoryInterface;
-use App\DTO\LogEntryDTO;
-use App\Models\LogEntry;
+use App\DTO\LogDTO;
+use App\Models\Log;
 
 class LogRepository implements LogRepositoryInterface
 {
@@ -16,17 +16,17 @@ class LogRepository implements LogRepositoryInterface
      */
     public function getLogs(): Collection
     {
-        return LogEntry::all();
+        return Log::all();
     }
 
     /**
      * сохраняет логи
-     * @param LogEntryDTO $dto
+     * @param LogDTO $dto
      * @return mixed
      */
-    public function postLogs(LogEntryDTO $dto): LogEntry
+    public function postLogs(LogDTO $dto): Log
     {
-        return LogEntry::create([
+        return Log::create([
             'ip_address' => $dto->ip_address,
             'request_date' => $dto->request_date,
             'url' => $dto->url,

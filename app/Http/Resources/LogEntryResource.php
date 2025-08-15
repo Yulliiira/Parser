@@ -5,13 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use App\Models\LogEntry;
+use App\Models\Log;
 
 class LogEntryResource extends JsonResource
 {
-    /**
-     * @mixin LogEntry
-     */
     public function toArray(Request $request): mixed
     {
         return [

@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Services\LogParserService;
 use Illuminate\Console\Command;
+
+use App\Services\LogParserService;
 
 class ParseLogsCommand extends Command
 {
