@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env*)",
+      "Read(./config/*local*)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git add .)",
+      "Bash(git add -A)",
+      "Bash(*artisan migrate*)"
+    ],
+    "ask": [
+      "Edit(./nginx/**)",
+      "Edit(./docker-compose.yml)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/lint.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
